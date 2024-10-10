@@ -57,9 +57,22 @@ document.addEventListener("DOMContentLoaded", () => {
   showQuestion();
 
   /************  TIMER  ************/
-
   let timer;
 
+  function startTimer() {
+    timer = setInterval(function countingDown(){
+    
+    if(quiz.timeRemaining <= 0) {
+      clearInterval(timer);
+      showResults();
+    }
+
+    quiz.timeRemaining--;
+    timeRemainingContainer.innerText = `${Math.floor(quiz.timeRemaining / 60).toString().padStart(2, "0")}:${(quiz.timeRemaining % 60).toString().padStart(2, "0")}`;
+  }, 
+  1000);
+}
+startTimer();
 
   /************  EVENT LISTENERS  ************/
 
@@ -73,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // nextButtonHandler() - Handles the click on the next button
   // showResults() - Displays the end view and the quiz results
 
-  function showQuestion(questionObj) {
+  function showQuestion() {
     // If the quiz has ended, show the results
     if (quiz.hasEnded()) {
       showResults();
@@ -142,8 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 1. Get all the choice elements. You can use the `document.querySelectorAll()` method.
     const allInputs = choiceContainer.querySelectorAll("input");
+    
     allInputs.forEach((input) => {
       console.log(input.checked);
+      
       if(input.checked){
         selectedAnswer = input.value
       }
@@ -170,7 +185,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function showResults() {
 
     // YOUR CODE HERE:
-    //
+    clearInterval(timer);
+
     // 1. Hide the quiz view (div#quizView)
     quizView.style.display = "none";
 
@@ -179,20 +195,32 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 3. Update the result container (div#result) inner text to show the number of correct answers out of total questions
     resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${questions.length} correct answers!`; 
-    // This value is hardcoded as a placeholder
+    
+
   }
 
   // ITERATION 4: Show restart button in the end view
-  const restartButton = document.querySelector("#restartButton");
-  restartButton.addEventListener("click", () => {
-    console.log("clicked restart")
-    quiz.currentQuestionIndex = 0;
-    quiz.correctAnswers = 0;
+  const restartButton = document.querySelector("#restartButton"); 
 
-    quiz.shuffleQuestions();
-    showQuestion(0);
+  restartButton.addEventListener("click", () => {
+    quiz.timeRemaining = 120;
+
+    clearInterval(timer); 
+
+    timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+
+    startTimer(); 
+
     quizView.style.display = "block";
     endView.style.display = "none";
+
+    quiz.currentQuestionIndex = 0;
+    quiz.correctAnswers = 0;
+    quiz.shuffleQuestions();
+    
+    showQuestion(0);
+
   });
-  
 });
+
+
